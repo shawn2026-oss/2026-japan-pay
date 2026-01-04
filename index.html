@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2026日本第一季全支付</title>
+    
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/197/197604.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/197/197604.png">
+
+    <style>
+        :root { --paypay: #00A1E9; --cathay: #008849; --next: #F39800; --free: #3FAF44; --warn: #E60012; --bg: #f8f9fa; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; padding-bottom: 60px; }
+        .app-shell { max-width: 500px; margin: 0 auto; }
+        .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        
+        /* ★★★ 新版標題樣式開始 ★★★ */
+        .styled-header { background: #F2F4F7; border-radius: 12px; padding: 20px; margin-bottom: 15px; text-align: left; }
+        .designer-label { font-size: 0.9rem; font-weight: 700; color: #007AFF; margin-bottom: 5px; }
+        .title-row { display: flex; justify-content: space-between; align-items: center; }
+        .main-title { margin: 0; font-size: 1.6rem; font-weight: 800; color: #333; line-height: 1.2; }
+        .version-bubble { background: #E5E7EB; color: #555; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; }
+        .subtitle { font-size: 1rem; color: #888; margin-top: 8px; }
+        /* ★★★ 新版標題樣式結束 ★★★ */
+
+        .system-status { text-align: center; font-size: 0.8rem; margin-bottom: 15px; padding: 5px; border-radius: 5px; }
+        .status-ok { color: #2e7d32; background: #e8f5e9; border: 1px solid #c8e6c9; }
+        .status-err { color: #c62828; background: #ffebee; border: 1px solid #ffcdd2; font-weight: bold; }
+
+        .rate-setting { display: flex; flex-direction: column; align-items: center; background: #e3f2fd; padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #90caf9; }
+        .rate-row { display: flex; align-items: center; gap: 8px; }
+        .rate-input { width: 90px; padding: 8px; border: 2px solid #2196f3; border-radius: 8px; text-align: center; font-size: 1.2rem; font-weight: bold; color: #0d47a1; }
+        .btn-sync { background: white; border: 1px solid #2196f3; color: #2196f3; width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-sync:active { background: #bbdefb; }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-box { padding: 12px 8px; border-radius: 10px; color: white; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .stat-val { font-size: 1.2rem; font-weight: 800; margin: 2px 0; }
+        .stat-sub { font-size: 0.75rem; opacity: 0.9; }
+
+        select, input[type="number"] { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; font-size: 1.1rem; box-sizing: border-box; outline: none; background: white; }
+        select#bankSelect.cathay { color: var(--cathay); border-color: var(--cathay); }
+        select#bankSelect.next { color: var(--next); border-color: var(--next); }
+
+        .live-alert { display: none; border-radius: 8px; margin-bottom: 15px; overflow: hidden; border: 1px solid #ffccc7; animation: slideDown 0.2s ease-out; }
+        .live-alert.show { display: block; }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+
+        .alert-header { background: #FFF1F0; padding: 10px 15px; color: #CF1322; font-weight: bold; font-size: 0.95rem; border-bottom: 1px solid #ffccc7; }
+        .alert-body { background: white; padding: 15px; font-size: 0.9rem; line-height: 1.6; }
+        
+        .tier-block { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #eee; }
+        .tier-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .tier-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .tier-range { font-weight: bold; color: #333; }
+        .tier-rate { font-weight: 800; font-size: 1.2rem; }
+        
+        .reason-row { display: flex; font-size: 0.85rem; margin-top: 3px; align-items: center; }
+        .icon { width: 18px; text-align: center; margin-right: 5px; font-weight:bold; }
+        .icon.got { color: #2E7D32; }
+        .icon.lost { color: #CF1322; }
+        .reason-text { color: #555; font-size: 0.85rem; }
+        .reason-detail { color: #999; font-size: 0.75rem; margin-left: 5px; }
+
+        button { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        .btn-add { background: #1a1a1a; color: white; margin-bottom: 10px; }
+        .btn-reset { background: transparent; color: #999; font-size: 0.85rem; text-decoration: underline; }
+
+        .list-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px dashed #eee; align-items: center; }
+        .bank-indicator { font-size: 0.7rem; padding: 1px 5px; border-radius: 3px; color: white; margin-left: 5px; }
+        .btn-delete { width: 36px; height: 36px; background: #ff3b30; color: white; border: none; border-radius: 8px; font-size: 1.2rem; display:flex; align-items:center; justify-content:center; cursor: pointer; }
+
+        .summary-panel { display: flex; justify-content: space-between; margin-bottom: 15px; background: #f8f9fa; border-radius: 12px; padding: 15px; border: 1px solid #eee; }
+        .sum-block { flex: 1; text-align: center; }
+        .sum-block:first-child { border-right: 1px solid #ddd; }
+        .sum-label { font-size: 0.85rem; color: #666; margin-bottom: 5px; }
+        .sum-val { font-size: 1.3rem; font-weight: 800; color: #333; }
+        .sum-sub { font-size: 0.75rem; color: #999; }
+        .sum-val.green { color: #2E7D32; }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+    <div class="card">
+        <div class="styled-header">
+            <div class="designer-label">Designed by Shawn</div>
+            <div class="title-row">
+                <h1 class="main-title">2026日本第一季全支付</h1>
+                <span class="version-bubble">V20</span>
+            </div>
+            <div class="subtitle">消費進度與回饋追蹤</div>
+        </div>
+        <div id="storageStatus" class="system-status">正在檢查系統...</div>
+        
+        <div class="rate-setting">
+            <div class="rate-row">
+                <span style="font-size:0.9rem; font-weight:bold; color:#0d47a1;">目前匯率</span>
+                <input type="number" id="rateInput" class="rate-input" step="0.001" value="0.210" oninput="manualSaveRate()">
+                <button class="btn-sync" onclick="fetchBOTRate(true)" title="強制更新台銀匯率">🔄</button>
+            </div>
+            <div id="rateStatus" style="font-size:0.75rem; color:#666; margin-top:5px;">使用自訂匯率 (不會自動變更)</div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="stat-box" style="background: var(--cathay);" id="boxCathay">
+                <div style="font-size:0.75rem;">國泰額度</div>
+                <div class="stat-val" id="remCathay">--</div>
+                <div class="stat-sub">(台幣$2000)</div>
+            </div>
+            <div class="stat-box" style="background: var(--next);" id="boxNext">
+                <div style="font-size:0.75rem;">將來額度</div>
+                <div class="stat-val" id="remNext">--</div>
+                <div class="stat-sub">(台幣$2000)</div>
+            </div>
+        </div>
+        <div class="stat-box" style="background: var(--paypay); margin-top:10px;" id="boxPayPay">
+            <div style="font-size:0.75rem;">PayPay 共用月額度</div>
+            <div class="stat-val" id="remPayPay">--</div>
+            <div class="stat-sub">(月$3428 / 單筆$857)</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div style="margin-bottom:15px;">
+            <label style="font-weight:bold; display:block; margin-bottom:5px;">扣款銀行</label>
+            <select id="bankSelect" onchange="changeBankStyle(); checkInputAlert();">
+                <option value="cathay">國泰世華 (Cathay)</option>
+                <option value="next">將來銀行 (Next Bank)</option>
+            </select>
+        </div>
+        <div style="margin-bottom:15px;">
+            <label style="font-weight:bold; display:block; margin-bottom:5px;">消費金額 (JPY)</label>
+            <input type="number" id="amtInput" inputmode="numeric" placeholder="在此輸入金額..." oninput="checkInputAlert()">
+        </div>
+        
+        <div id="alertBox" class="live-alert"></div>
+        
+        <button class="btn-add" onclick="addRecord()">加入紀錄</button>
+        <div style="text-align:center;"><button class="btn-reset" onclick="resetData()">🗑️ 清除所有資料</button></div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin:0 0 15px 0; font-size:1.1rem; text-align:center; color:#444;">旅程消費統計</h3>
+        
+        <div class="summary-panel">
+            <div class="sum-block">
+                <div class="sum-label">總消費 (JPY)</div>
+                <div class="sum-val" id="totalSpent">0</div>
+                <div class="sum-sub" id="totalSpentTWD">≈ 0 TWD</div>
+            </div>
+            <div class="sum-block">
+                <div class="sum-label">總回饋 (JPY)</div>
+                <div class="sum-val green" id="totalReward">0</div>
+                <div class="sum-sub" id="totalRewardTWD">≈ 0 TWD</div>
+            </div>
+        </div>
+
+        <div id="logList"></div>
+    </div>
+</div>
+
+<script>
+    // ★★★ 設定區 ★★★
+    const TWD_LIMITS = { BK: 2000, PP_M: 3428, PP_S: 857 };
+    
+    // V20 正式版 (更換儲存金鑰以避免舊版衝突)
+    const KEYS = {
+        CURRENT: 'shawn_2026_v20_final', 
+        OLD_V19: 'shawn_2026_v19_net'
+    };
+
+    let records = [];
+    let currentRate = 0.210;
+
+    init();
+
+    function init() {
+        if (checkStorageAvailable()) {
+            document.getElementById('storageStatus').innerHTML = "🟢 系統正常：資料可自動儲存";
+            document.getElementById('storageStatus').className = "system-status status-ok";
+        } else {
+            document.getElementById('storageStatus').innerHTML = "🔴 系統警告：瀏覽器阻擋存檔 (請關閉無痕模式)";
+            document.getElementById('storageStatus').className = "system-status status-err";
+        }
+
+        try {
+            // 資料救援：嘗試讀取 V20，如果沒有，就去撈 V19 的資料
+            records = JSON.parse(localStorage.getItem(KEYS.CURRENT)) || [];
+            if (records.length === 0) {
+                let oldData = JSON.parse(localStorage.getItem(KEYS.OLD_V19));
+                if (oldData && oldData.length > 0) {
+                    records = oldData;
+                    saveData(); // 存入新版金鑰
+                }
+            }
+
+            const savedRate = localStorage.getItem('shawn_rate_v20');
+            if (savedRate) {
+                currentRate = parseFloat(savedRate);
+                document.getElementById('rateStatus').innerText = "使用您設定的匯率";
+            } else {
+                fetchBOTRate(false);
+            }
+        } catch (e) { console.log('Init error', e); }
+
+        document.getElementById('rateInput').value = currentRate;
+        changeBankStyle();
+        updateUI();
+    }
+
+    function checkStorageAvailable() {
+        try {
+            const test = '__storage_test__';
+            localStorage.setItem(test, test);
+            localStorage.removeItem(test);
+            return true;
+        } catch (e) { return false; }
+    }
+
+    function saveData() {
+        try { localStorage.setItem(KEYS.CURRENT, JSON.stringify(records)); } catch(e){}
+    }
+
+    async function fetchBOTRate(isManual) {
+        if(isManual) document.getElementById('rateStatus').innerText = "正在同步台銀...";
+        try {
+            const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://rate.bot.com.tw/xrt/flcsv/0/day"));
+            const data = await res.json();
+            const rows = data.contents.split('\n');
+            for (let row of rows) {
+                if (row.startsWith('JPY')) {
+                    const spotSelling = parseFloat(row.split(',')[5]);
+                    if (!isNaN(spotSelling)) {
+                        currentRate = spotSelling;
+                        document.getElementById('rateInput').value = spotSelling;
+                        try { localStorage.setItem('shawn_rate_v20', spotSelling); } catch(e){}
+                        document.getElementById('rateStatus').innerText = "已更新至台銀匯率: " + spotSelling;
+                        updateUI();
+                        return;
+                    }
+                }
+            }
+        } catch (e) { if(isManual) document.getElementById('rateStatus').innerText = "同步失敗"; }
+    }
+
+    function manualSaveRate() {
+        const val = parseFloat(document.getElementById('rateInput').value);
+        if (val > 0) { 
+            currentRate = val; 
+            try { localStorage.setItem('shawn_rate_v20', val); } catch(e){}
+            document.getElementById('rateStatus').innerText = "使用自訂匯率";
+            updateUI(); 
+        }
+    }
+
+    function changeBankStyle() { const s = document.getElementById('bankSelect'); s.className = s.value; }
+
+    function getDynamicLimits() {
+        return {
+            BK_JPY: Math.floor(TWD_LIMITS.BK / currentRate),
+            PP_M_JPY: Math.floor(TWD_LIMITS.PP_M / currentRate),
+            PP_S_JPY: Math.floor(TWD_LIMITS.PP_S / currentRate)
+        };
+    }
+
+    function getRemaining() {
+        const LIMITS_JPY = getDynamicLimits();
+        let sp_PP = 0, sp_C = 0, sp_N = 0;
+        records.forEach(r => {
+            sp_PP += r.amount;
+            if (r.bank === 'cathay') sp_C += r.amount; else sp_N += r.amount;
+        });
+        return { 
+            pp: Math.max(0, LIMITS_JPY.PP_M_JPY - sp_PP), 
+            c: Math.max(0, LIMITS_JPY.BK_JPY - sp_C), 
+            n: Math.max(0, LIMITS_JPY.BK_JPY - sp_N) 
+        };
+    }
+
+    function checkInputAlert() {
+        const val = parseInt(document.getElementById('amtInput').value);
+        const bank = document.getElementById('bankSelect').value;
+        const alertBox = document.getElementById('alertBox');
+        
+        if (!val || val <= 0) { alertBox.classList.remove('show'); return; }
+
+        const segments = calculateSegments(val, bank);
+        
+        let htmlBody = segments.map(seg => {
+            let itemsHtml = seg.items.map(item => `
+                <div class="reason-row">
+                    <div class="icon ${item.type}">${item.type==='got'?'✔':'✕'}</div>
+                    <div class="reason-text">${item.text}</div>
+                    ${item.note ? `<div class="reason-detail">(${item.note})</div>` : ''}
+                </div>`).join('');
+            return `<div class="tier-block">
+                <div class="tier-head"><span class="tier-range">${seg.range}</span><span class="tier-rate" style="color:${seg.color}">${seg.rate}%</span></div>
+                <div>${itemsHtml}</div>
+            </div>`;
+        }).join('');
+
+        let isPerfect = segments.length === 1 && segments[0].rate === 10;
+        alertBox.innerHTML = `
+            <div class="alert-header" style="background:${isPerfect?'#E8F5E9':'#FFF1F0'}; color:${isPerfect?'#2E7D32':'#CF1322'}; border-color:${isPerfect?'#b7eb8f':'#ffccc7'}">${isPerfect?'✨ 完美！全額 10% 拿滿':'⚠️ 注意：部分回饋降級'}</div>
+            <div class="alert-body">${htmlBody}</div>`;
+        alertBox.classList.add('show');
+    }
+
+    function calculateSegments(val, bankType) {
+        const rem = getRemaining();
+        const LIMITS_JPY = getDynamicLimits();
+        const bankRem = (bankType === 'cathay' ? rem.c : rem.n);
+        
+        const limit_pp = Math.min(LIMITS_JPY.PP_S_JPY, rem.pp);
+        const limit_bk = Math.min(LIMITS_JPY.BK_JPY, bankRem);
+
+        let points = [0, limit_pp, limit_bk, val].filter(p => p >= 0 && p <= val);
+        points = [...new Set(points)].sort((a, b) => a - b);
+
+        let segments = [];
+        for (let i = 0; i < points.length - 1; i++) {
+            let start = points[i];
+            let end = points[i+1];
+            if (end - start <= 0) continue;
+
+            let rate = 1.5;
+            let items = [{type:'got', text:'免手續費', note:''}];
+
+            if (end <= limit_pp) {
+                rate += 3.5;
+                items.push({type:'got', text:'PayPay', note:''});
+            } else {
+                let note = "";
+                if (rem.pp <= 0) note = "月額度已滿";
+                else if (end > rem.pp) note = "月額度不足"; 
+                else if (end > LIMITS_JPY.PP_S_JPY) note = `單筆上限 ${LIMITS_JPY.PP_S_JPY}`;
+                items.push({type:'lost', text:'PayPay', note: note});
+            }
+
+            if (end <= limit_bk) {
+                rate += 5.0;
+                items.push({type:'got', text:'銀行', note:''});
+            } else {
+                let note = "";
+                if (bankRem <= 0) note = "額度已滿";
+                else if (end > bankRem) note = "額度不足";
+                else if (end > LIMITS_JPY.BK_JPY) note = `單筆上限 ${LIMITS_JPY.BK_JPY}`;
+                items.push({type:'lost', text:'銀行', note: note});
+            }
+
+            let color = (rate >= 10) ? "#2E7D32" : ((rate >= 5) ? "#F39800" : "#CF1322");
+            segments.push({ range: `${start.toLocaleString()} ~ ${end.toLocaleString()}`, rate: rate, color: color, items: items });
+        }
+        return segments;
+    }
+
+    function updateUI() {
+        const log = document.getElementById('logList'); log.innerHTML = '';
+        let totalRec = 0;
+        let totalSpent = 0;
+        const LIMITS_JPY = getDynamicLimits();
+        let sim = { pp: LIMITS_JPY.PP_M_JPY, c: LIMITS_JPY.BK_JPY, n: LIMITS_JPY.BK_JPY };
+        
+        records.forEach((r, i) => {
+            let val = r.amount;
+            totalSpent += val;
+            let limit_pp = Math.min(LIMITS_JPY.PP_S_JPY, sim.pp);
+            let limit_bk = Math.min(LIMITS_JPY.BK_JPY, (r.bank==='cathay'?sim.c:sim.n));
+            let points = [0, limit_pp, limit_bk, val].filter(p => p >= 0 && p <= val);
+            points = [...new Set(points)].sort((a,b)=>a-b);
+            let thisReward = 0;
+            for(let k=0; k<points.length-1; k++){
+                let s = points[k], e = points[k+1], amt = e-s;
+                let rate = 1.5;
+                if(e <= limit_pp) rate += 3.5;
+                if(e <= limit_bk) rate += 5.0;
+                thisReward += amt * (rate/100);
+            }
+            thisReward = Math.floor(thisReward);
+            totalRec += thisReward;
+            sim.pp = Math.max(0, sim.pp - val);
+            if(r.bank==='cathay') sim.c = Math.max(0, sim.c - val); else sim.n = Math.max(0, sim.n - val);
+
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `<div style="flex-grow:1; display:flex; justify-content:space-between; align-items:center; padding-right:10px;">
+                    <div><b>${r.amount.toLocaleString()}</b><span class="bank-indicator" style="background:${r.bank === 'cathay' ? 'var(--cathay)' : 'var(--next)'}">${r.bank === 'cathay' ? '國泰' : '將來'}</span></div>
+                    <div style="text-align:right; font-size:1.1rem; color:var(--free);">+${thisReward}</div>
+                </div><button class="btn-delete" onclick="deleteRecord(${i})">×</button>`;
+            log.prepend(div);
+        });
+
+        const rem = getRemaining();
+        document.getElementById('remCathay').innerText = rem.c.toLocaleString();
+        document.getElementById('remNext').innerText = rem.n.toLocaleString();
+        document.getElementById('remPayPay').innerText = rem.pp.toLocaleString();
+
+        document.getElementById('totalSpent').innerText = totalSpent.toLocaleString();
+        document.getElementById('totalSpentTWD').innerText = `≈ ${Math.round(totalSpent * currentRate).toLocaleString()} TWD`;
+        document.getElementById('totalReward').innerText = totalRec.toLocaleString();
+        document.getElementById('totalRewardTWD').innerText = `≈ ${Math.round(totalRec * currentRate).toLocaleString()} TWD`;
+    }
+
+    function addRecord() {
+        const input = document.getElementById('amtInput');
+        const val = parseInt(input.value);
+        if (val > 0) { 
+            records.push({ amount: val, bank: document.getElementById('bankSelect').value }); 
+            saveData();
+            input.value = ''; 
+            document.getElementById('alertBox').classList.remove('show');
+            updateUI(); 
+        }
+    }
+    
+    function deleteRecord(index) { if(confirm('刪除這筆紀錄？')) { records.splice(index, 1); saveData(); updateUI(); } }
+    function resetData() { if(confirm('清空所有紀錄？')) { records = []; saveData(); updateUI(); } }
+</script>
+</body>
+</html>
